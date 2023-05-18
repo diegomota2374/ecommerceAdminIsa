@@ -10,9 +10,13 @@ export default function ProductForm({
   price: existingPrice,
   images: existingImages,
   category: assignedCategory,
+  properties: assignedProperties,
 }) {
   const [title, setTitle] = useState(existingTitle || "");
   const [category, setCategory] = useState(assignedCategory || "");
+  const [productProperties, setProductProperties] = useState(
+    assignedProperties || {}
+  );
   const [description, setDescription] = useState(existingDescription || "");
   const [price, setPrice] = useState(existingPrice || "");
   const [images, setImages] = useState(existingImages || []);
@@ -29,7 +33,14 @@ export default function ProductForm({
 
   async function createProduct(ev) {
     ev.preventDefault();
-    const data = { title, description, price, images, category };
+    const data = {
+      title,
+      description,
+      price,
+      images,
+      category,
+      properties: productProperties,
+    };
 
     if (_id) {
       await axios.put("/api/products", { ...data, _id });
@@ -63,6 +74,27 @@ export default function ProductForm({
     }
   }
 
+  function setProductProp(propName, value) {
+    setProductProperties((prev) => {
+      const newProductProps = { ...prev };
+      newProductProps[propName] = value;
+      return newProductProps;
+    });
+  }
+
+  const propertiesToFill = [];
+  if (categories.length > 0 && category) {
+    let catInfo = categories.find(({ _id }) => _id === category);
+    propertiesToFill.push(...catInfo.properties);
+    while (catInfo?.parent?._id) {
+      const parentCat = categories.find(
+        ({ _id }) => _id === catInfo?.parent?._id
+      );
+      propertiesToFill.push(...parentCat.properties);
+      catInfo = parentCat;
+    }
+  }
+
   return (
     <form onSubmit={createProduct}>
       <label>Product name</label>
@@ -78,6 +110,22 @@ export default function ProductForm({
         {categories.length > 0 &&
           categories.map((c) => <option value={c._id}>{c.name}</option>)}
       </select>
+
+      {propertiesToFill.length > 0 &&
+        propertiesToFill.map((p) => (
+          <div className={"flex gap-1"}>
+            <div>{p.name}</div>
+            <select
+              value={productProperties[p.name]}
+              onChange={(ev) => setProductProp(p.name, ev.target.value)}
+            >
+              {p.values.map((v) => (
+                <option value={v}>{v}</option>
+              ))}
+            </select>
+          </div>
+        ))}
+
       <label>Photos</label>
       <div className={"mb-2 flex flex-wrap gap-1"}>
         <ReactSortable
