@@ -135,7 +135,12 @@ export default function ProductForm({
         >
           {!!images?.length &&
             images.map((link) => (
-              <div key={link} className={"h-24 bg-white p-4 shadow-sm rounded-md border border-gray-200"}>
+              <div
+                key={link}
+                className={
+                  "h-24 bg-white p-4 shadow-sm rounded-md border border-gray-200"
+                }
+              >
                 <img src={link} alt="" className={"rounded-lg"} />
               </div>
             ))}
@@ -147,7 +152,7 @@ export default function ProductForm({
         )}
         <label
           className={
-            "inline-block w-24 h-24 text-center cursor-pointer flex items-center justify-center text-sm gap-1 text-primary rounded-lg bg-white shadow-sm border border-primary"
+            " w-24 h-24 text-center cursor-pointer flex items-center justify-center text-sm gap-1 text-primary rounded-lg bg-white shadow-sm border border-primary"
           }
         >
           <svg
